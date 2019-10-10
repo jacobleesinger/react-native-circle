@@ -45,6 +45,7 @@ jobs:
 
       - run: echo "test"
       - run: pwd
+      - run: ls -a
       - run:
           name: Build Android JS Bundle
           working_directory: android
