@@ -29,7 +29,20 @@ jobs:
           name: jest tests
           command: yarn test
 
+  android:
+    working_directory: ~/react-native-circle/android
+    docker:
+      - image: circleci/android:api-27-node8-alpha
+    steps:
+      - run:
+          name: Build Android
+          working_directory: android
+          command: ./gradlew assembleRelease
+
 workflows:
   node:
     jobs:
       - node
+      - android:
+        requires:
+          - node:
