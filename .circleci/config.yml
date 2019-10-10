@@ -8,12 +8,16 @@ orbs:
 # Custom jobs which are not part of the Orb
 jobs:
   checkout_code:
+    docker:
+    - image: circleci/node:10.16.3
     steps:
       - checkout
       - persist_to_workspace:
           root: .
           paths: .
-  analyze_js:
+  analyse_js:
+    docker:
+    - image: circleci/node:10.16.3
     steps:
       - attach_workspace:
           at: .
