@@ -56,13 +56,11 @@ jobs:
 
       - run:
           name: Build Android JS Bundle
-          working_directory: android
           command: |
             ./gradlew bundleReleaseJsAndAssets
 
       - run:
           name: Build Android APK
-          working_directory: android
           command: |
             ./gradlew assembleRelease -x bundleReleaseJsAndAssets
 
