@@ -30,9 +30,12 @@ jobs:
           command: yarn test
 
   build-android:
+    working_directory: ~/react-native-circle/android
     docker:
-      - image: circleci/android:api-25-alpha
+      - image: circleci/android:api-27-node8-alpha
     steps:
+      - checkout:
+        - path: ~/react-native-circle
       - run: echo "test"
 
 workflows:
