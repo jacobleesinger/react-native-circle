@@ -46,6 +46,10 @@ jobs:
       - run: echo "test"
       - run: pwd
       - run: ls -a
+
+      - run:
+          working_directory: ~/react-native-circle
+          command: yarn install
       - run:
           name: Android Dependencies
           command: ./gradlew androidDependencies
