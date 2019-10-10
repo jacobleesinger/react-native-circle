@@ -40,7 +40,7 @@ jobs:
           command: ./gradlew assembleRelease
 
 workflows:
-  node:
+  all:
     jobs:
       - node
       - android:
