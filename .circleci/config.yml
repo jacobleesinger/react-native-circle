@@ -43,16 +43,43 @@ jobs:
       - checkout:
           path: ~/react-native-circle
 
-      - run: echo "test"
-      - run: pwd
-      - run: ls -a
+      - restore_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}--{{ arch }}
 
       - run:
           working_directory: ~/react-native-circle
           command: yarn install
+
+      - save_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}--{{ arch }}
+          paths:
+            - ~react-native-circle/.cache/yarn
+
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}--{{ arch }}
+          paths:
+            - ~/react-native-circle/node_modules
+
+      - run:
+          name: Check MD5 on files
+          command: |
+            md5sum build.gradle
+            md5sum app/build.gradle
+            cat app/build.gradle | sed -n -e '/dependencies/,$p' > android.app.build.gradle.deps
+
+      - restore_cache:
+          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "android.apps.build.gradle.deps" }}
+
       - run:
           name: Android Dependencies
           command: ./gradlew androidDependencies
+
+      - save_cache:
+          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "andrpoid.app.build.gradle.deps" }}
+          paths: .gradle
 
       - run:
           name: Build Android JS Bundle
