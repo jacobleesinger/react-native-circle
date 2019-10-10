@@ -28,3 +28,9 @@ jobs:
       - run:
           name: jest tests
           command: yarn test
+
+workflows:
+  version: 2.1
+    node:
+      jobs:
+        - node
