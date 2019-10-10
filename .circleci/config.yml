@@ -1,100 +1,163 @@
 version: 2.1
+orbs:
+  rn: react-native-community/react-native@1.0.0
+
 jobs:
-  node:
-    working_directory: ~/react-native-circle
-    docker:
-      - image: circleci/node:10.16.3
+  checkout_code:
+    executor: rn/linux_js
     steps:
       - checkout
-    
-      - restore_cache:
-          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
-
-      - restore_cache:
-          key: node-v1-{{ checksum "package.json" }}--{{ arch }}
-
-      - run: yarn install
-
-      - save_cache:
-          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
-          paths: 
-            - ~/.cache/yarn
-
-      - save_cache:
-          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
-          paths:
-            - node_modules
-
+      - persist_to_workspace:
+          root: .
+          paths: .
+  analyze_js:
+    executor: rn/linux_js
+    steps:
+      - attach_workspace:
+          at: .
+      - rn/yarn_install
       - run:
-          name: jest tests
+          name: Jest Tests
           command: yarn test
 
-  build-android:
-    working_directory: ~/react-native-circle/android
-    docker:
-      - image: circleci/android:api-28-node8-alpha
-
-    environment:
-      FL_OUTPUT_DIR: output
-      FASTLANE_LANE: beta
-      _JAVA_OPTIONS: "-Xmx1500m"
-
-    steps:
-      - checkout:
-          path: ~/react-native-circle
-
-      - restore_cache:
-          key: yarn-v1-{{ checksum "~/react-native-circle/yarn.lock" }}-{{ arch }}
-
-      - restore_cache:
-          key: node-v1-{{ checksum "~/react-native-circle/package.json" }}--{{ arch }}
-
-      - run:
-          working_directory: ~/react-native-circle
-          command: yarn install
-
-      - save_cache:
-          key: yarn-v1-{{ checksum "~/react-native-circle/yarn.lock" }}--{{ arch }}
-          paths:
-            - ~react-native-circle/.cache/yarn
-
-      - save_cache:
-          key: node-v1-{{ checksum "~/react-native-circle/package.json" }}--{{ arch }}
-          paths:
-            - ~/react-native-circle/node_modules
-
-      - run:
-          name: Check MD5 on files
-          command: |
-            md5sum build.gradle
-            md5sum app/build.gradle
-            cat app/build.gradle | sed -n -e '/dependencies/,$p' > android.app.build.gradle.deps
-
-      - restore_cache:
-          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "android.app.build.gradle.deps" }}
-
-      - run:
-          name: Android Dependencies
-          command: ./gradlew androidDependencies
-
-      - save_cache:
-          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "android.app.build.gradle.deps" }}
-          paths: .gradle
-
-      - run:
-          name: Build Android JS Bundle
-          command: |
-            ./gradlew bundleReleaseJsAndAssets
-
-      - run:
-          name: Build Android APK
-          command: |
-            ./gradlew assembleRelease -x bundleReleaseJsAndAssets
-
 workflows:
-  build:
+  test:
     jobs:
-      - node
-      - build-android:
+      - checkout_code
+      - analyze_js:
           requires:
-            - node
+            - checkout_code
+      
+            # Build the android app in debug mode
+            - rn/android_build:
+                name: build_android_debug
+                project_path: "android"
+                build_type: debug
+                requires:
+                  - analyze_js
+
+            # Build the android app in release mode
+            - rn/android_build:
+                name: build_android_release
+                project_path: "android"
+                build_type: release
+                requires:
+                  - analyze_js
+            - rn/android_test:
+                detox_configuration: "android.emu.release"
+                requires:
+                  - build_android_release
+
+            # buld and tests the iOS app in release mode
+            - rn/ios_build_and_test:
+                project_path: "ios/Example.xcodeproj"
+                device: "iPhone X"
+                build_configuration: "Release"
+                scheme: "Example"
+                detox_configuration: 'ios.sim.release'
+                requires:
+                  - analyze_js
+
+
+
+
+# version: 2.1
+# jobs:
+#   node:
+#     working_directory: ~/react-native-circle
+#     docker:
+#       - image: circleci/node:10.16.3
+#     steps:
+#       - checkout
+    
+#       - restore_cache:
+#           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+#       - restore_cache:
+#           key: node-v1-{{ checksum "package.json" }}--{{ arch }}
+
+#       - run: yarn install
+
+#       - save_cache:
+#           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+#           paths: 
+#             - ~/.cache/yarn
+
+#       - save_cache:
+#           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+#           paths:
+#             - node_modules
+
+#       - run:
+#           name: jest tests
+#           command: yarn test
+
+#   build-android:
+#     working_directory: ~/react-native-circle/android
+#     docker:
+#       - image: circleci/android:api-28-node8-alpha
+
+#     environment:
+#       FL_OUTPUT_DIR: output
+#       FASTLANE_LANE: beta
+#       _JAVA_OPTIONS: "-Xmx1500m"
+
+#     steps:
+#       - checkout:
+#           path: ~/react-native-circle
+
+#       - restore_cache:
+#           key: yarn-v1-{{ checksum "~/react-native-circle/yarn.lock" }}-{{ arch }}
+
+#       - restore_cache:
+#           key: node-v1-{{ checksum "~/react-native-circle/package.json" }}--{{ arch }}
+
+#       - run:
+#           working_directory: ~/react-native-circle
+#           command: yarn install
+
+#       - save_cache:
+#           key: yarn-v1-{{ checksum "~/react-native-circle/yarn.lock" }}--{{ arch }}
+#           paths:
+#             - ~react-native-circle/.cache/yarn
+
+#       - save_cache:
+#           key: node-v1-{{ checksum "~/react-native-circle/package.json" }}--{{ arch }}
+#           paths:
+#             - ~/react-native-circle/node_modules
+
+#       - run:
+#           name: Check MD5 on files
+#           command: |
+#             md5sum build.gradle
+#             md5sum app/build.gradle
+#             cat app/build.gradle | sed -n -e '/dependencies/,$p' > android.app.build.gradle.deps
+
+#       - restore_cache:
+#           key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "android.app.build.gradle.deps" }}
+
+#       - run:
+#           name: Android Dependencies
+#           command: ./gradlew androidDependencies
+
+#       - save_cache:
+#           key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "android.app.build.gradle.deps" }}
+#           paths: .gradle
+
+#       - run:
+#           name: Build Android JS Bundle
+#           command: |
+#             ./gradlew bundleReleaseJsAndAssets
+
+#       - run:
+#           name: Build Android APK
+#           command: |
+#             ./gradlew assembleRelease -x bundleReleaseJsAndAssets
+
+# workflows:
+#   build:
+#     jobs:
+#       - node
+#       - build-android:
+#           requires:
+#             - node
