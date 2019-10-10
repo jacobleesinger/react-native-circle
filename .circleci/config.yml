@@ -61,14 +61,14 @@ workflows:
             - build_android_release
 
       # Build and test the iOS app in release mode
-      - rn/ios_build_and_test:
-          project_path: "ios/Example.xcodeproj"
-          device: "iPhone X"
-          build_configuration: "Release"
-          scheme: "Example"
-          detox_configuration: "ios.sim.release"
-          requires:
-            - analyze_js
+      # - rn/ios_build_and_test:
+      #     project_path: "ios/Example.xcodeproj"
+      #     device: "iPhone X"
+      #     build_configuration: "Release"
+      #     scheme: "Example"
+      #     detox_configuration: "ios.sim.release"
+      #     requires:
+      #       - analyze_js
 
 # version: 2.1
 # jobs:
