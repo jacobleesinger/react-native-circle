@@ -14,7 +14,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths: .
-  analyse_js:
+  analyze_js:
     executor: rn/linux_js
     steps:
       - attach_workspace:
@@ -33,7 +33,7 @@ workflows:
 
       # Analyze the Javascript using ESLint, Flow, and Jest
       # Note: This is a job which is defined above and not part of the Orb
-      - analyse_js:
+      - analyze_js:
           requires:
             - checkout_code
 
@@ -43,7 +43,7 @@ workflows:
           project_path: "android"
           build_type: debug
           requires:
-            - analyse_js
+            - analyze_js
 
       # Build and test the Android app in release mode
       # Note: We split these into seperate jobs because we can build the Android app on a Linux machine and preserve the expensive MacOS executor minutes for when it's required
@@ -52,7 +52,7 @@ workflows:
           project_path: "android"
           build_type: release
           requires:
-            - analyse_js
+            - analyze_js
       - rn/android_test:
           detox_configuration: "android.emu.release"
           requires:
@@ -66,7 +66,7 @@ workflows:
           scheme: "Example"
           detox_configuration: "ios.sim.release"
           requires:
-            - analyse_js
+            - analyze_js
 
 # version: 2.1
 # jobs:
