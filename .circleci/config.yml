@@ -37,6 +37,4 @@ workflows:
   build:
     jobs:
       - node
-      - build-android:
-          requires:
-            - node
+      - build-android
