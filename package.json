@@ -4,7 +4,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "web": "expo start --web",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "jetify"
   },
   "dependencies": {
     "expo": "^35.0.0",
@@ -19,7 +20,8 @@
   },
   "devDependencies": {
     "babel-preset-expo": "^7.0.0",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "jetifier": "^1.6.4"
   },
   "jest": {
     "preset": "react-native"
