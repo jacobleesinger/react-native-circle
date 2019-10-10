@@ -44,7 +44,7 @@ jobs:
           path: ~/react-native-circle
 
       - run: echo "test"
-
+      - run: pwd
       - run:
           name: Build Android JS Bundle
           working_directory: android
