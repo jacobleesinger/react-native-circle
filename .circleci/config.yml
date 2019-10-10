@@ -32,7 +32,7 @@ jobs:
   build-android:
     working_directory: ~/react-native-circle/android
     docker:
-      - image: circleci/android:api-27-node8-alpha
+      - image: circleci/android:api-28-node8-alpha
 
     environment:
       FL_OUTPUT_DIR: output
