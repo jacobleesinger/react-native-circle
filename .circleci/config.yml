@@ -33,9 +33,14 @@ jobs:
     working_directory: ~/react-native-circle/android
     docker:
       - image: circleci/android:api-27-node8-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
     steps:
       - checkout:
           path: ~/react-native-circle
+      - run:
+        name: Download Dependencies
+        command: ./gradlew androidDependencies
       - run:
           name: Build Android
           command: ./gradlew assembleRelease
