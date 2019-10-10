@@ -44,22 +44,22 @@ jobs:
           path: ~/react-native-circle
 
       - restore_cache:
-          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          key: yarn-v1-{{ checksum "~/react-native-circle/yarn.lock" }}-{{ arch }}
 
       - restore_cache:
-          key: node-v1-{{ checksum "package.json" }}--{{ arch }}
+          key: node-v1-{{ checksum "~/react-native-circle/package.json" }}--{{ arch }}
 
       - run:
           working_directory: ~/react-native-circle
           command: yarn install
 
       - save_cache:
-          key: yarn-v1-{{ checksum "yarn.lock" }}--{{ arch }}
+          key: yarn-v1-{{ checksum "~/react-native-circle/yarn.lock" }}--{{ arch }}
           paths:
             - ~react-native-circle/.cache/yarn
 
       - save_cache:
-          key: node-v1-{{ checksum "package.json" }}--{{ arch }}
+          key: node-v1-{{ checksum "~/react-native-circle/package.json" }}--{{ arch }}
           paths:
             - ~/react-native-circle/node_modules
 
@@ -71,14 +71,14 @@ jobs:
             cat app/build.gradle | sed -n -e '/dependencies/,$p' > android.app.build.gradle.deps
 
       - restore_cache:
-          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "android.apps.build.gradle.deps" }}
+          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "apps.build.gradle.deps" }}
 
       - run:
           name: Android Dependencies
           command: ./gradlew androidDependencies
 
       - save_cache:
-          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "andrpoid.app.build.gradle.deps" }}
+          key: android-jars-v1-{{ checksum "build.gradle" }}--{{ checksum "app.build.gradle.deps" }}
           paths: .gradle
 
       - run:
