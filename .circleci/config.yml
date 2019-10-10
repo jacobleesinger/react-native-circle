@@ -1,33 +1,33 @@
 version: 2.1
 jobs:
-  node:
-    working_directory: ~/react-native-circle
-    docker:
-      - image: circleci/node:10.16.3
-    steps:
-      - checkout
+  # node:
+  #   working_directory: ~/react-native-circle
+  #   docker:
+  #     - image: circleci/node:10.16.3
+  #   steps:
+  #     - checkout
     
-      - restore_cache:
-          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+  #     - restore_cache:
+  #         key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
 
-      - restore_cache:
-          key: node-v1-{{ checksum "package.json" }}--{{ arch }}
+  #     - restore_cache:
+  #         key: node-v1-{{ checksum "package.json" }}--{{ arch }}
 
-      - run: yarn install
+  #     - run: yarn install
 
-      - save_cache:
-          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
-          paths: 
-            - ~/.cache/yarn
+  #     - save_cache:
+  #         key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+  #         paths: 
+  #           - ~/.cache/yarn
 
-      - save_cache:
-          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
-          paths:
-            - node_modules
+  #     - save_cache:
+  #         key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+  #         paths:
+  #           - node_modules
 
-      - run:
-          name: jest tests
-          command: yarn test
+  #     - run:
+  #         name: jest tests
+  #         command: yarn test
 
   build-android:
     docker:
@@ -36,5 +36,5 @@ jobs:
 workflows:
   build:
     jobs:
-      - node
+      # - node
       - build-android
